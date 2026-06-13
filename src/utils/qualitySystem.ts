@@ -45,6 +45,21 @@ export const getCurrentQualityGrade = (quality: GoodsQuality): QualityGrade => {
   return 'perfect';
 };
 
+export const getWorstQualityGrade = (quality: GoodsQuality): QualityGrade => {
+  const grades: QualityGrade[] = ['damaged', 'poor', 'fair', 'good', 'perfect'];
+  for (const grade of grades) {
+    if (quality[grade] > 0) {
+      return grade;
+    }
+  }
+  return 'perfect';
+};
+
+export const isAllPerfect = (quality: GoodsQuality): boolean => {
+  const total = getTotalQuantity(quality);
+  return total > 0 && quality.perfect === total;
+};
+
 export const getTotalQuantity = (quality: GoodsQuality): number => {
   return quality.perfect + quality.good + quality.fair + quality.poor + quality.damaged;
 };
@@ -231,12 +246,14 @@ export const TREATMENT_OPTIONS: Record<TreatmentType, Omit<TreatmentOption, 'app
 
 export const getAvailableTreatments = (
   goods: Goods,
-  currentGrade: QualityGrade
+  quality: GoodsQuality
 ): TreatmentOption[] => {
   const treatments: TreatmentOption[] = [];
   
-  const currentGradeIndex = getGradeIndex(currentGrade);
-  if (currentGradeIndex <= 0) {
+  const worstGrade = getWorstQualityGrade(quality);
+  const worstGradeIndex = getGradeIndex(worstGrade);
+  
+  if (worstGradeIndex <= 0) {
     return treatments;
   }
   
@@ -245,7 +262,7 @@ export const getAvailableTreatments = (
     if (!baseOption) continue;
     
     const targetGradeIndex = getGradeIndex(baseOption.targetGrade);
-    if (currentGradeIndex <= targetGradeIndex) continue;
+    if (worstGradeIndex <= targetGradeIndex && treatmentType !== 'discount-delivery') continue;
     
     treatments.push({
       ...baseOption,
@@ -262,6 +279,10 @@ export const applyTreatment = (
   treatment: TreatmentOption,
   _goods: Goods
 ): GoodsQuality => {
+  if (treatment.type === 'discount-delivery') {
+    return quality;
+  }
+  
   const currentGrade = getCurrentQualityGrade(quality);
   const currentGradeIndex = getGradeIndex(currentGrade);
   const targetGradeIndex = getGradeIndex(treatment.targetGrade);

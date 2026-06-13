@@ -129,6 +129,7 @@ export interface Commission {
   damageType?: DamageType;
   hasBeenTreated?: boolean;
   treatmentHistory?: { type: TreatmentType; cost: number; at: number }[];
+  isDiscounted?: boolean;
 }
 
 export interface PlayerVehicle {

@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, AlertTriangle, TrendingUp, TrendingDown, Coins, Star, Package, X, Sparkles } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, TrendingUp, TrendingDown, Coins, Star, Package, X, Sparkles, Tag } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import type { TripSettlement } from '../../utils/settlement';
 import {
@@ -186,9 +186,17 @@ const SettlementModal = ({ settlement, onClose }: SettlementModalProps) => {
                     )}
 
                     {item.qualityPenalty > 0 && (
-                      <div className="mb-3 text-xs text-orange-600 flex items-center gap-1">
+                      <div className="mb-2 text-xs text-orange-600 flex items-center gap-1">
                         <TrendingDown className="w-3 h-3" />
                         品相损耗扣减: ¥{item.qualityPenalty}
+                      </div>
+                    )}
+
+                    {item.isDiscounted && item.discountAmount > 0 && (
+                      <div className="mb-2 text-xs text-amber-600 flex items-center gap-1">
+                        <Tag className="w-3 h-3" />
+                        折价交付扣减: ¥{item.discountAmount}
+                        <span className="text-emerald-600 ml-1">(声望损失减半)</span>
                       </div>
                     )}
 
@@ -208,6 +216,12 @@ const SettlementModal = ({ settlement, onClose }: SettlementModalProps) => {
                       {item.isLate && (
                         <span className="px-2 py-1 rounded-full bg-amber-100 text-amber-700">
                           迟到 罚款 ¥{item.latePenalty}
+                        </span>
+                      )}
+                      {item.isDiscounted && (
+                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          折价交付
                         </span>
                       )}
                       {!item.isLate && item.qualityGrade === 'perfect' && (

@@ -1,4 +1,4 @@
-import { Package, AlertCircle, Sparkles } from 'lucide-react';
+import { Package, AlertCircle, Sparkles, Tag } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import {
   getCurrentQualityGrade,
@@ -6,6 +6,7 @@ import {
   getGradeColorClass,
   getGradeBgColorClass,
   getDamageTypeLabel,
+  isAllPerfect,
 } from '../../utils/qualitySystem';
 import type { Commission, Goods } from '../../../shared/types';
 
@@ -104,7 +105,7 @@ const InventoryGrid = ({ commissions, goodsList }: InventoryGridProps) => {
             const qualityInfo = getQualityInfo(commission, goods);
             const isSelected = selectedCommissions.includes(commission.id);
             const isShipped = commission.isShipped;
-            const needsTreatment = qualityInfo && qualityInfo.grade !== 'perfect';
+            const needsTreatment = commission.quality && !isAllPerfect(commission.quality);
 
             return (
               <div
@@ -175,6 +176,13 @@ const InventoryGrid = ({ commissions, goodsList }: InventoryGridProps) => {
                   </div>
                 )}
 
+                {commission.isDiscounted && (
+                  <div className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    已折价
+                  </div>
+                )}
+
                 <div className="flex gap-2 mt-3">
                   {needsTreatment && !isShipped && (
                     <button
@@ -184,6 +192,11 @@ const InventoryGrid = ({ commissions, goodsList }: InventoryGridProps) => {
                       <Sparkles className="w-3 h-3" />
                       货物养护
                     </button>
+                  )}
+                  {!needsTreatment && !isShipped && (
+                    <div className="flex-1 py-1.5 bg-emerald-100 text-emerald-600 text-xs font-medium rounded-lg text-center">
+                      品相完好
+                    </div>
                   )}
                   {isShipped && (
                     <div className="flex-1 py-1.5 bg-slate-200 text-slate-500 text-xs font-medium rounded-lg text-center">

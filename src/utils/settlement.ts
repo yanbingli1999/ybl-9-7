@@ -36,6 +36,8 @@ export interface TripSettlement {
     isLate: boolean;
     latePenalty: number;
     qualityPenalty: number;
+    isDiscounted: boolean;
+    discountAmount: number;
   }[];
   tripCost: number;
   totalIncome: number;
@@ -138,8 +140,12 @@ export const settleTrip = (
     const priceMultiplier = goods ? calculateAveragePriceMultiplier(quality, goods) : 1;
     const qualityPenalty = Math.floor(commission.reward * (1 - priceMultiplier));
     
+    const isDiscounted = commission.isDiscounted || false;
+    const discountMultiplier = isDiscounted ? 0.85 : 1.0;
+    const discountAmount = isDiscounted ? Math.floor(commission.reward * priceMultiplier * 0.15) : 0;
+    
     const bonusMultiplier = 1 + (reputationBonus / 100);
-    const baseReward = Math.floor(commission.reward * priceMultiplier * bonusMultiplier);
+    const baseReward = Math.floor(commission.reward * priceMultiplier * bonusMultiplier * discountMultiplier);
     const actualReward = Math.max(0, baseReward - latePenalty);
     
     totalIncome += actualReward;
@@ -153,7 +159,8 @@ export const settleTrip = (
     
     const repMultiplier = goods ? calculateAverageReputationMultiplier(quality, goods) : 1;
     if (repMultiplier < 1) {
-      const reputationLoss = Math.floor(20 * (1 - repMultiplier));
+      const baseReputationLoss = Math.floor(20 * (1 - repMultiplier));
+      const reputationLoss = isDiscounted ? Math.floor(baseReputationLoss * 0.5) : baseReputationLoss;
       reputationChange -= reputationLoss;
       damageCount++;
     }
@@ -172,6 +179,8 @@ export const settleTrip = (
       isLate,
       latePenalty,
       qualityPenalty,
+      isDiscounted,
+      discountAmount,
     };
   });
   

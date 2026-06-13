@@ -764,6 +764,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     const newQuality = applyTreatment(commission.quality, treatment, goods);
     const newGrade = getCurrentQualityGrade(newQuality);
+    const isDiscountTreatment = treatment.type === 'discount-delivery';
     
     const updatedCommissions = commissions.map(c => {
       if (c.id === treatmentCommissionId) {
@@ -773,6 +774,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           quality: newQuality,
           currentQualityGrade: newGrade,
           hasBeenTreated: true,
+          isDiscounted: isDiscountTreatment ? true : c.isDiscounted,
           treatmentHistory: [
             ...treatmentHistory,
             { type: treatment.type, cost, at: Date.now() },

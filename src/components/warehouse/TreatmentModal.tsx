@@ -31,7 +31,7 @@ const TreatmentModal = () => {
 
   const currentGrade = getCurrentQualityGrade(commission.quality);
   const currentStage = getQualityStage(goods, currentGrade);
-  const availableTreatments = getAvailableTreatments(goods, currentGrade);
+  const availableTreatments = getAvailableTreatments(goods, commission.quality);
 
   const handleApplyTreatment = (treatment: TreatmentOption) => {
     applyTreatmentToCommission(treatment);
