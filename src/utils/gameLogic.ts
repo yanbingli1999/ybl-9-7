@@ -11,6 +11,7 @@ import type {
   Trip
 } from '../../shared/types';
 import { calculateReputationGrade, calculateWarehouseCapacity, calculateWarehouseUpgradeCost } from './settlement';
+import { createInitialQuality } from './qualitySystem';
 
 export const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -66,6 +67,10 @@ export const generateRandomCommissions = (
       fragility: goods.fragility,
       isAccepted: false,
       createdAt: Date.now(),
+      quality: createInitialQuality(quantity),
+      currentQualityGrade: 'perfect',
+      hasBeenTreated: false,
+      treatmentHistory: [],
     });
   }
   

@@ -7,7 +7,16 @@
     "fragility": 60,
     "basePrice": 500,
     "icon": "🧵",
-    "description": "精美的江南丝绸，轻盈但易受潮"
+    "description": "精美的江南丝绸，轻盈但易受潮染尘",
+    "qualityStages": [
+      { "grade": "perfect", "name": "光洁如新", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "丝绸光泽亮丽，毫无瑕疵" },
+      { "grade": "good", "name": "微有浮尘", "priceMultiplier": 0.9, "reputationMultiplier": 0.9, "description": "表面略有浮尘，不影响品质" },
+      { "grade": "fair", "name": "染尘晦暗", "priceMultiplier": 0.75, "reputationMultiplier": 0.75, "description": "灰尘较多，色泽略显晦暗" },
+      { "grade": "poor", "name": "污渍磨损", "priceMultiplier": 0.55, "reputationMultiplier": 0.5, "description": "有明显污渍和磨损痕迹" },
+      { "grade": "damaged", "name": "破损不堪", "priceMultiplier": 0.3, "reputationMultiplier": 0.2, "description": "丝绸严重破损，几乎无法使用" }
+    ],
+    "damageTypes": ["dust", "wear"],
+    "defaultTreatments": ["dust-clean", "repack", "discount-delivery"]
   },
   {
     "id": "porcelain",
@@ -17,7 +26,16 @@
     "fragility": 90,
     "basePrice": 800,
     "icon": "🏺",
-    "description": "景德镇瓷器，精美但极易破碎"
+    "description": "景德镇瓷器，精美但极易破碎",
+    "qualityStages": [
+      { "grade": "perfect", "name": "完好无损", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "瓷器完整无缺，光泽莹润" },
+      { "grade": "good", "name": "细微划痕", "priceMultiplier": 0.85, "reputationMultiplier": 0.85, "description": "有极细微的划痕，不影响使用" },
+      { "grade": "fair", "name": "有瑕疵", "priceMultiplier": 0.7, "reputationMultiplier": 0.7, "description": "有小磕碰或釉面瑕疵" },
+      { "grade": "poor", "name": "裂纹初现", "priceMultiplier": 0.5, "reputationMultiplier": 0.45, "description": "出现明显裂纹，但尚未碎裂" },
+      { "grade": "damaged", "name": "破损碎裂", "priceMultiplier": 0.2, "reputationMultiplier": 0.15, "description": "瓷器破碎，价值大减" }
+    ],
+    "damageTypes": ["crack", "break"],
+    "defaultTreatments": ["repair", "repack", "discount-delivery"]
   },
   {
     "id": "tea",
@@ -27,7 +45,16 @@
     "fragility": 40,
     "basePrice": 300,
     "icon": "🍵",
-    "description": "上等好茶，需防潮防霉"
+    "description": "上等好茶，需防潮防霉",
+    "qualityStages": [
+      { "grade": "perfect", "name": "新鲜干燥", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "茶叶新鲜干燥，香气浓郁" },
+      { "grade": "good", "name": "微有潮气", "priceMultiplier": 0.88, "reputationMultiplier": 0.85, "description": "略有潮气，香气稍减" },
+      { "grade": "fair", "name": "受潮发软", "priceMultiplier": 0.72, "reputationMultiplier": 0.7, "description": "明显受潮，茶叶发软" },
+      { "grade": "poor", "name": "霉味初现", "priceMultiplier": 0.5, "reputationMultiplier": 0.45, "description": "有轻微霉味，品质下降" },
+      { "grade": "damaged", "name": "霉变变质", "priceMultiplier": 0.25, "reputationMultiplier": 0.2, "description": "严重霉变，无法饮用" }
+    ],
+    "damageTypes": ["damp", "mold"],
+    "defaultTreatments": ["sun-dry", "repack", "discount-delivery"]
   },
   {
     "id": "spice",
@@ -37,7 +64,16 @@
     "fragility": 20,
     "basePrice": 1000,
     "icon": "🌶️",
-    "description": "南洋进口的珍贵香料"
+    "description": "南洋进口的珍贵香料",
+    "qualityStages": [
+      { "grade": "perfect", "name": "香气馥郁", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "香料香气浓郁，品质上乘" },
+      { "grade": "good", "name": "香气尚可", "priceMultiplier": 0.9, "reputationMultiplier": 0.9, "description": "香气略有散失，品质仍佳" },
+      { "grade": "fair", "name": "香气减弱", "priceMultiplier": 0.75, "reputationMultiplier": 0.75, "description": "香气明显减弱" },
+      { "grade": "poor", "name": "几近无味", "priceMultiplier": 0.55, "reputationMultiplier": 0.5, "description": "香气所剩无几" },
+      { "grade": "damaged", "name": "变质无味", "priceMultiplier": 0.3, "reputationMultiplier": 0.2, "description": "香料变质，毫无香气" }
+    ],
+    "damageTypes": ["damp", "wear"],
+    "defaultTreatments": ["repack", "discount-delivery"]
   },
   {
     "id": "medicine",
@@ -47,7 +83,16 @@
     "fragility": 50,
     "basePrice": 600,
     "icon": "🌿",
-    "description": "珍贵中药材，需小心保存"
+    "description": "珍贵中药材，需小心保存",
+    "qualityStages": [
+      { "grade": "perfect", "name": "上等佳品", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "药材品质上佳，药力充足" },
+      { "grade": "good", "name": "品质尚佳", "priceMultiplier": 0.88, "reputationMultiplier": 0.9, "description": "品质略有下降，药效尚可" },
+      { "grade": "fair", "name": "一般品质", "priceMultiplier": 0.72, "reputationMultiplier": 0.7, "description": "品质一般，药效减弱" },
+      { "grade": "poor", "name": "药力大减", "priceMultiplier": 0.5, "reputationMultiplier": 0.45, "description": "药力大幅减退" },
+      { "grade": "damaged", "name": "失效变质", "priceMultiplier": 0.25, "reputationMultiplier": 0.2, "description": "药材变质失效" }
+    ],
+    "damageTypes": ["damp", "mold"],
+    "defaultTreatments": ["sun-dry", "repack", "discount-delivery"]
   },
   {
     "id": "salt",
@@ -57,7 +102,16 @@
     "fragility": 10,
     "basePrice": 100,
     "icon": "🧂",
-    "description": "日常必需品，不易损坏"
+    "description": "日常必需品，不易损坏",
+    "qualityStages": [
+      { "grade": "perfect", "name": "洁白纯净", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "食盐洁白纯净" },
+      { "grade": "good", "name": "略有杂质", "priceMultiplier": 0.95, "reputationMultiplier": 0.95, "description": "略有杂质，不影响使用" },
+      { "grade": "fair", "name": "杂质较多", "priceMultiplier": 0.85, "reputationMultiplier": 0.85, "description": "杂质稍多" },
+      { "grade": "poor", "name": "受潮结块", "priceMultiplier": 0.7, "reputationMultiplier": 0.7, "description": "受潮结块" },
+      { "grade": "damaged", "name": "污染变质", "priceMultiplier": 0.4, "reputationMultiplier": 0.3, "description": "被污染无法食用" }
+    ],
+    "damageTypes": ["damp", "dust"],
+    "defaultTreatments": ["sun-dry", "discount-delivery"]
   },
   {
     "id": "rice",
@@ -67,7 +121,16 @@
     "fragility": 15,
     "basePrice": 80,
     "icon": "🍚",
-    "description": "粮食，量大但不易损坏"
+    "description": "粮食，量大但不易损坏",
+    "qualityStages": [
+      { "grade": "perfect", "name": "新米饱满", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "新米颗粒饱满" },
+      { "grade": "good", "name": "品质尚可", "priceMultiplier": 0.92, "reputationMultiplier": 0.9, "description": "品质略有下降" },
+      { "grade": "fair", "name": "陈米味淡", "priceMultiplier": 0.8, "reputationMultiplier": 0.75, "description": "陈米味道较淡" },
+      { "grade": "poor", "name": "生虫受潮", "priceMultiplier": 0.55, "reputationMultiplier": 0.5, "description": "生虫或受潮" },
+      { "grade": "damaged", "name": "霉变不能食", "priceMultiplier": 0.25, "reputationMultiplier": 0.2, "description": "严重霉变不可食用" }
+    ],
+    "damageTypes": ["damp", "mold"],
+    "defaultTreatments": ["sun-dry", "discount-delivery"]
   },
   {
     "id": "wine",
@@ -77,7 +140,16 @@
     "fragility": 70,
     "basePrice": 400,
     "icon": "🍶",
-    "description": "陈年佳酿，酒坛易碎"
+    "description": "陈年佳酿，酒坛易碎",
+    "qualityStages": [
+      { "grade": "perfect", "name": "酒坛完好", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "酒坛完好，酒香四溢" },
+      { "grade": "good", "name": "轻微渗漏", "priceMultiplier": 0.85, "reputationMultiplier": 0.85, "description": "酒坛略有渗漏" },
+      { "grade": "fair", "name": "酒坛有裂", "priceMultiplier": 0.7, "reputationMultiplier": 0.7, "description": "酒坛出现裂纹" },
+      { "grade": "poor", "name": "洒漏过半", "priceMultiplier": 0.45, "reputationMultiplier": 0.4, "description": "酒液洒漏严重" },
+      { "grade": "damaged", "name": "酒坛碎裂", "priceMultiplier": 0.2, "reputationMultiplier": 0.15, "description": "酒坛完全碎裂" }
+    ],
+    "damageTypes": ["crack", "break"],
+    "defaultTreatments": ["repair", "repack", "discount-delivery"]
   },
   {
     "id": "jewelry",
@@ -87,7 +159,16 @@
     "fragility": 30,
     "basePrice": 2000,
     "icon": "💎",
-    "description": "珍贵珠宝，价值连城"
+    "description": "珍贵珠宝，价值连城",
+    "qualityStages": [
+      { "grade": "perfect", "name": "璀璨夺目", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "珠宝璀璨夺目，完美无瑕" },
+      { "grade": "good", "name": "细微划痕", "priceMultiplier": 0.92, "reputationMultiplier": 0.9, "description": "有极细微的划痕" },
+      { "grade": "fair", "name": "光泽稍减", "priceMultiplier": 0.8, "reputationMultiplier": 0.75, "description": "光泽略有减弱" },
+      { "grade": "poor", "name": "明显瑕疵", "priceMultiplier": 0.6, "reputationMultiplier": 0.55, "description": "有明显的瑕疵或磨损" },
+      { "grade": "damaged", "name": "严重损毁", "priceMultiplier": 0.3, "reputationMultiplier": 0.25, "description": "珠宝严重损坏" }
+    ],
+    "damageTypes": ["wear", "crack"],
+    "defaultTreatments": ["repair", "discount-delivery"]
   },
   {
     "id": "paper",
@@ -97,7 +178,16 @@
     "fragility": 55,
     "basePrice": 250,
     "icon": "📜",
-    "description": "上等宣纸，怕水怕潮"
+    "description": "上等宣纸，怕水怕潮",
+    "qualityStages": [
+      { "grade": "perfect", "name": "洁白如玉", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "宣纸洁白如玉，质地均匀" },
+      { "grade": "good", "name": "略有折痕", "priceMultiplier": 0.9, "reputationMultiplier": 0.9, "description": "略有折痕，不影响使用" },
+      { "grade": "fair", "name": "微黄起皱", "priceMultiplier": 0.75, "reputationMultiplier": 0.7, "description": "纸张发黄起皱" },
+      { "grade": "poor", "name": "受潮破损", "priceMultiplier": 0.5, "reputationMultiplier": 0.45, "description": "受潮有破损" },
+      { "grade": "damaged", "name": "霉烂损毁", "priceMultiplier": 0.2, "reputationMultiplier": 0.15, "description": "霉烂损毁无法使用" }
+    ],
+    "damageTypes": ["damp", "wear"],
+    "defaultTreatments": ["sun-dry", "repack", "discount-delivery"]
   },
   {
     "id": "ink",
@@ -107,7 +197,16 @@
     "fragility": 45,
     "basePrice": 180,
     "icon": "🖋️",
-    "description": "徽墨，文房四宝之一"
+    "description": "徽墨，文房四宝之一",
+    "qualityStages": [
+      { "grade": "perfect", "name": "墨色如漆", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "墨锭黝黑光亮，品质上乘" },
+      { "grade": "good", "name": "略有划痕", "priceMultiplier": 0.9, "reputationMultiplier": 0.9, "description": "表面略有划痕" },
+      { "grade": "fair", "name": "墨质稍减", "priceMultiplier": 0.78, "reputationMultiplier": 0.75, "description": "墨质略有下降" },
+      { "grade": "poor", "name": "干裂磨损", "priceMultiplier": 0.55, "reputationMultiplier": 0.5, "description": "墨锭干裂或磨损严重" },
+      { "grade": "damaged", "name": "碎裂失效", "priceMultiplier": 0.25, "reputationMultiplier": 0.2, "description": "墨锭碎裂无法使用" }
+    ],
+    "damageTypes": ["crack", "wear"],
+    "defaultTreatments": ["repair", "discount-delivery"]
   },
   {
     "id": "fur",
@@ -117,6 +216,15 @@
     "fragility": 35,
     "basePrice": 700,
     "icon": "🦊",
-    "description": "珍贵皮毛，需防虫蛀"
+    "description": "珍贵皮毛，需防虫蛀",
+    "qualityStages": [
+      { "grade": "perfect", "name": "皮毛光泽", "priceMultiplier": 1.0, "reputationMultiplier": 1.0, "description": "皮毛油光水滑，品质极佳" },
+      { "grade": "good", "name": "微有浮尘", "priceMultiplier": 0.9, "reputationMultiplier": 0.9, "description": "略有浮尘，品质尚可" },
+      { "grade": "fair", "name": "毛色稍暗", "priceMultiplier": 0.75, "reputationMultiplier": 0.7, "description": "毛色略显暗淡" },
+      { "grade": "poor", "name": "脱毛虫蛀", "priceMultiplier": 0.5, "reputationMultiplier": 0.45, "description": "有脱毛或虫蛀痕迹" },
+      { "grade": "damaged", "name": "严重损毁", "priceMultiplier": 0.25, "reputationMultiplier": 0.2, "description": "严重虫蛀破损" }
+    ],
+    "damageTypes": ["dust", "wear"],
+    "defaultTreatments": ["dust-clean", "repack", "discount-delivery"]
   }
 ]

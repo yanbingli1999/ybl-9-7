@@ -19,6 +19,40 @@ export interface Route {
   condition: number;
 }
 
+export type QualityGrade = 'perfect' | 'good' | 'fair' | 'poor' | 'damaged';
+
+export interface QualityStage {
+  grade: QualityGrade;
+  name: string;
+  priceMultiplier: number;
+  reputationMultiplier: number;
+  description: string;
+}
+
+export type DamageType = 'crack' | 'damp' | 'dust' | 'break' | 'mold' | 'wear';
+
+export type TreatmentType = 'repack' | 'sun-dry' | 'repair' | 'discount-delivery' | 'dust-clean';
+
+export interface TreatmentOption {
+  type: TreatmentType;
+  name: string;
+  description: string;
+  cost: number;
+  costPerUnit: boolean;
+  targetGrade: QualityGrade;
+  reputationChange: number;
+  applicableGoods: string[];
+  applicableFromGrades: QualityGrade[];
+}
+
+export interface GoodsQuality {
+  perfect: number;
+  good: number;
+  fair: number;
+  poor: number;
+  damaged: number;
+}
+
 export interface Goods {
   id: string;
   name: string;
@@ -28,6 +62,9 @@ export interface Goods {
   basePrice: number;
   icon: string;
   description: string;
+  qualityStages: QualityStage[];
+  damageTypes: DamageType[];
+  defaultTreatments: TreatmentType[];
 }
 
 export interface Vehicle {
@@ -87,6 +124,11 @@ export interface Commission {
   shippedAt?: number;
   shippedGameHours?: number;
   completedAt?: number;
+  quality?: GoodsQuality;
+  currentQualityGrade?: QualityGrade;
+  damageType?: DamageType;
+  hasBeenTreated?: boolean;
+  treatmentHistory?: { type: TreatmentType; cost: number; at: number }[];
 }
 
 export interface PlayerVehicle {
@@ -172,6 +214,9 @@ export interface SettlementResult {
     quantity: number;
     delivered: number;
     damaged: number;
+    quality: GoodsQuality;
+    qualityGrade: QualityGrade;
+    damageType?: DamageType;
     reward: number;
     isLate: boolean;
   }[];

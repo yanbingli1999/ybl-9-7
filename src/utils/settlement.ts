@@ -6,9 +6,19 @@ import type {
   GameEvent, 
   SettlementResult,
   LedgerEntry,
-  ReputationGrade
+  ReputationGrade,
+  GoodsQuality,
+  QualityGrade,
+  DamageType,
 } from '../../shared/types';
 import { calculateIsLateGameTime } from './gameLogic';
+import {
+  createInitialQuality,
+  calculateTransportQualityDegradation,
+  calculateAveragePriceMultiplier,
+  calculateAverageReputationMultiplier,
+  getCurrentQualityGrade,
+} from './qualitySystem';
 
 export interface TripSettlement {
   tripId: string;
@@ -18,10 +28,14 @@ export interface TripSettlement {
     quantity: number;
     delivered: number;
     damaged: number;
+    quality: GoodsQuality;
+    qualityGrade: QualityGrade;
+    damageType?: DamageType;
     baseReward: number;
     actualReward: number;
     isLate: boolean;
     latePenalty: number;
+    qualityPenalty: number;
   }[];
   tripCost: number;
   totalIncome: number;
@@ -45,40 +59,6 @@ export const calculateReputationGrade = (score: number): { grade: ReputationGrad
   }
 };
 
-export const calculateActualDamage = (
-  commission: Commission,
-  weather: Weather,
-  routeCondition: number,
-  isOverloaded: boolean,
-  events: GameEvent[]
-): number => {
-  const baseFragility = commission.fragility / 100;
-  const weatherDamage = weather.damageChance;
-  const roadCondition = 1 - routeCondition;
-  const overloadFactor = isOverloaded ? 0.3 : 0;
-  
-  let eventDamage = 0;
-  events.forEach(event => {
-    event.effects.forEach(effect => {
-      if (effect.type === 'damage') {
-        eventDamage += (effect.value as number) / 100;
-      }
-    });
-  });
-  
-  const totalDamageChance = Math.min(0.95,
-    baseFragility * (1 + weatherDamage) * (1 + roadCondition) * (1 + overloadFactor) + eventDamage
-  );
-  
-  const random = Math.random();
-  if (random < totalDamageChance) {
-    const maxDamage = Math.ceil(commission.quantity * 0.4);
-    return Math.floor(Math.random() * maxDamage) + 1;
-  }
-  
-  return 0;
-};
-
 export const settleTrip = (
   trip: Trip,
   commissions: Commission[],
@@ -98,7 +78,8 @@ export const settleTrip = (
   const eventDescriptions: string[] = [];
   
   let extraDelay = 0;
-  let extraGoldFromEvents = 0;
+  let totalEventDamage = 0;
+  
   eventEffects.forEach(item => {
     const { title, effect } = item;
     if (effect.type === 'delay') {
@@ -108,12 +89,14 @@ export const settleTrip = (
       reputationChange += effect.value as number;
     }
     if (effect.type === 'gold') {
-      extraGoldFromEvents += effect.value as number;
       if ((effect.value as number) < 0) {
         totalExpense += Math.abs(effect.value as number);
       } else {
         totalIncome += (effect.value as number);
       }
+    }
+    if (effect.type === 'damage') {
+      totalEventDamage += effect.value as number;
     }
     eventDescriptions.push(`${title}: ${effect.description}`);
   });
@@ -122,21 +105,19 @@ export const settleTrip = (
     const goods = goodsList.find(g => g.id === commission.goodsId);
     const goodsName = goods?.name || '未知货物';
     
-    const relevantEvents = eventEffects
-      .filter(e => e.effect.type === 'damage')
-      .map(e => {
-        const event = e as any;
-        return { ...event, effects: [{ type: 'damage', value: e.effect.value }] };
-      });
+    const qualityResult = goods
+      ? calculateTransportQualityDegradation(
+          commission,
+          goods,
+          weather,
+          routeCondition,
+          isOverloaded,
+          totalEventDamage
+        )
+      : { quality: createInitialQuality(commission.quantity), damageType: 'wear' as DamageType };
     
-    const damaged = calculateActualDamage(
-      commission,
-      weather,
-      routeCondition,
-      isOverloaded,
-      relevantEvents
-    );
-    const delivered = commission.quantity - damaged;
+    const { quality, damageType } = qualityResult;
+    const qualityGrade = getCurrentQualityGrade(quality);
     
     const acceptedGameHours = commission.acceptedGameHours || trip.departureGameHours || 0;
     const departedGameHours = trip.departureGameHours || 0;
@@ -154,13 +135,11 @@ export const settleTrip = (
       totalExpense += latePenalty;
     }
     
-    if (damaged > 0) {
-      const damageCompensation = Math.floor(commission.reward * (damaged / commission.quantity) * 0.5);
-      totalExpense += damageCompensation;
-    }
+    const priceMultiplier = goods ? calculateAveragePriceMultiplier(quality, goods) : 1;
+    const qualityPenalty = Math.floor(commission.reward * (1 - priceMultiplier));
     
     const bonusMultiplier = 1 + (reputationBonus / 100);
-    const baseReward = Math.floor(commission.reward * (delivered / commission.quantity) * bonusMultiplier);
+    const baseReward = Math.floor(commission.reward * priceMultiplier * bonusMultiplier);
     const actualReward = Math.max(0, baseReward - latePenalty);
     
     totalIncome += actualReward;
@@ -172,8 +151,10 @@ export const settleTrip = (
       reputationChange += 20;
     }
     
-    if (damaged > 0) {
-      reputationChange -= 10;
+    const repMultiplier = goods ? calculateAverageReputationMultiplier(quality, goods) : 1;
+    if (repMultiplier < 1) {
+      const reputationLoss = Math.floor(20 * (1 - repMultiplier));
+      reputationChange -= reputationLoss;
       damageCount++;
     }
     
@@ -181,12 +162,16 @@ export const settleTrip = (
       commissionId: commission.id,
       goodsName,
       quantity: commission.quantity,
-      delivered,
-      damaged,
+      delivered: quality.perfect + quality.good + quality.fair + quality.poor,
+      damaged: quality.damaged,
+      quality,
+      qualityGrade,
+      damageType,
       baseReward: commission.reward,
       actualReward,
       isLate,
       latePenalty,
+      qualityPenalty,
     };
   });
   
@@ -252,12 +237,12 @@ export const generateLedgerEntries = (
         createdAt: 0,
       });
     }
-    if (c.damaged > 0) {
+    if (c.qualityPenalty > 0) {
       entries.push({
         id: '',
         type: 'expense',
-        description: `货损 - ${c.goodsName} x${c.damaged}`,
-        amount: Math.floor(c.baseReward * (c.damaged / c.quantity) * 0.5),
+        description: `品相损耗 - ${c.goodsName}`,
+        amount: c.qualityPenalty,
         date,
         day,
         category: '货损',

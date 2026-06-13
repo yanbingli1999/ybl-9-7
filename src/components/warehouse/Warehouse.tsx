@@ -1,6 +1,7 @@
 import { Warehouse as WarehouseIcon, ArrowUpCircle, Database, Coins } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore';
 import InventoryGrid from './InventoryGrid';
+import TreatmentModal from './TreatmentModal';
 
 const Warehouse = () => {
   const { warehouse, commissions, goodsList, player, upgradeWarehouse } = useGameStore();
@@ -142,6 +143,7 @@ const Warehouse = () => {
 
         <InventoryGrid commissions={commissions} goodsList={goodsList} />
       </div>
+      <TreatmentModal />
     </div>
   );
 };

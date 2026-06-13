@@ -40,6 +40,13 @@ import {
   calculateLoad,
   calculateTripCost,
 } from '../utils/routeCalc';
+import {
+  applyTreatment,
+  getTreatmentCost,
+  getCurrentQualityGrade,
+  createInitialQuality,
+} from '../utils/qualitySystem';
+import type { TreatmentOption } from '../../shared/types';
 
 interface GameState {
   player: Player;
@@ -67,6 +74,9 @@ interface GameState {
   currentTripId: string | null;
   pendingEvents: GameEvent[];
   
+  showTreatmentModal: boolean;
+  treatmentCommissionId: string | null;
+  
   isLoading: boolean;
   isDispatching: boolean;
   error: string | null;
@@ -91,6 +101,10 @@ interface GameState {
   
   upgradeWarehouse: () => boolean;
   advanceTimeOfDay: () => void;
+  
+  openTreatmentModal: (commissionId: string) => void;
+  closeTreatmentModal: () => void;
+  applyTreatmentToCommission: (treatment: TreatmentOption) => boolean;
   
   updatePlayerGold: (amount: number) => void;
   updatePlayerReputation: (amount: number) => void;
@@ -125,6 +139,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   showEvent: false,
   currentTripId: null,
   pendingEvents: [],
+  
+  showTreatmentModal: false,
+  treatmentCommissionId: null,
   
   isLoading: false,
   isDispatching: false,
@@ -229,6 +246,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       showEvent: false,
       currentTripId: null,
       pendingEvents: [],
+      
+      showTreatmentModal: false,
+      treatmentCommissionId: null,
     });
     
     get().generateDailyCommissions();
@@ -273,12 +293,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     const acceptedGameHours = calculateTotalGameHours(state.player.currentDay, state.player.timeOfDay);
     
+    const initialQuality = commission.quality || createInitialQuality(commission.quantity);
+    const initialGrade = commission.currentQualityGrade || 'perfect';
+    
     const updatedCommissions = state.commissions.map(c =>
       c.id === commissionId ? {
         ...c,
         isAccepted: true,
         acceptedAt: Date.now(),
         acceptedGameHours,
+        quality: initialQuality,
+        currentQualityGrade: initialGrade,
+        hasBeenTreated: c.hasBeenTreated || false,
+        treatmentHistory: c.treatmentHistory || [],
       } : c
     );
     
@@ -695,6 +722,97 @@ export const useGameStore = create<GameState>((set, get) => ({
         gold: player.gold - warehouse.upgradeCost,
       },
       ledger: [...state.ledger, ledgerEntry],
+    });
+    
+    api.ledger.post(ledgerEntry);
+    get().saveGame();
+    
+    return true;
+  },
+  
+  openTreatmentModal: (commissionId: string) => {
+    set({
+      showTreatmentModal: true,
+      treatmentCommissionId: commissionId,
+    });
+  },
+  
+  closeTreatmentModal: () => {
+    set({
+      showTreatmentModal: false,
+      treatmentCommissionId: null,
+    });
+  },
+  
+  applyTreatmentToCommission: (treatment: TreatmentOption) => {
+    const state = get();
+    const { treatmentCommissionId, commissions, goodsList, player } = state;
+    
+    if (!treatmentCommissionId) return false;
+    
+    const commission = commissions.find(c => c.id === treatmentCommissionId);
+    if (!commission || !commission.quality) return false;
+    
+    const goods = goodsList.find(g => g.id === commission.goodsId);
+    if (!goods) return false;
+    
+    const cost = getTreatmentCost(treatment, commission.quantity, goods);
+    if (player.gold < cost) {
+      set({ error: '金币不足，无法进行处理' });
+      return false;
+    }
+    
+    const newQuality = applyTreatment(commission.quality, treatment, goods);
+    const newGrade = getCurrentQualityGrade(newQuality);
+    
+    const updatedCommissions = commissions.map(c => {
+      if (c.id === treatmentCommissionId) {
+        const treatmentHistory = c.treatmentHistory || [];
+        return {
+          ...c,
+          quality: newQuality,
+          currentQualityGrade: newGrade,
+          hasBeenTreated: true,
+          treatmentHistory: [
+            ...treatmentHistory,
+            { type: treatment.type, cost, at: Date.now() },
+          ],
+        };
+      }
+      return c;
+    });
+    
+    const ledgerEntry: LedgerEntry = {
+      id: generateId(),
+      type: 'expense',
+      description: `${goods.name} - ${treatment.name}`,
+      amount: cost,
+      date: getCurrentDate(player.currentDay),
+      day: player.currentDay,
+      category: '货物处理',
+      createdAt: Date.now(),
+    };
+    
+    let reputationChange = 0;
+    if (treatment.reputationChange > 0) {
+      reputationChange = treatment.reputationChange;
+    }
+    
+    const newReputation = Math.max(0, Math.min(1000, player.reputation + reputationChange));
+    const repInfo = calculateReputationGrade(newReputation);
+    
+    set({
+      commissions: updatedCommissions,
+      player: {
+        ...player,
+        gold: player.gold - cost,
+        reputation: newReputation,
+        reputationGrade: repInfo.grade as ReputationGrade,
+        priceBonus: repInfo.priceBonus,
+      },
+      ledger: [...state.ledger, ledgerEntry],
+      showTreatmentModal: false,
+      treatmentCommissionId: null,
     });
     
     api.ledger.post(ledgerEntry);
